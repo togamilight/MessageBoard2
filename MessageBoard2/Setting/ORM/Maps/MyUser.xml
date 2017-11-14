@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="MyUser" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!--别名-->
+  <alias>
+    <typeAlias alias="MyUser" type="MessageBoard2.Models.MyUser,MessageBoard2" />
+  </alias>
+  <!--缓存模型-->
+  <cacheModels>
+    <cacheModel id="UserCache" implementation="MEMORY">
+      <flushInterval hours="24"/>
+      <flushOnExecute statement="MyUser.AddUser"/>
+      <!--<flushOnExecute statement="MyUser.UpdateUser"/>-->
+      <flushOnExecute statement="MyUser.DeleteUser"/>
+      <!--<flushOnExecute statement="MyUser.DeleteUsers"/>-->
+      <property name="Type" value="WEAK"/>
+    </cacheModel>
+  </cacheModels>
+  
+  <!--字段映射-->
+  <resultMaps>
+  </resultMaps>
+  
+  <statements>
+    <!--添加-->
+    <insert id="AddUser" parameterClass="MyUser">
+      INSERT INTO MyUser(Username,Password,PhoneNum,SignDate) VALUES(#Username#,#Password#,#PhoneNum#,#SignDate#)
+      <!--插入数据之后，model对象的主属性得到自增主键的新值-->
+      <selectKey resultClass="int" type="post" property="Id">
+        SELECT @@IDENTITY AS value
+      </selectKey>
+    </insert>
+    <!--根据条件语句whereSql获取所有对象-->
+    <select id="GetUsersBySql" resultClass="MyUser" parameterClass="string"  cacheModel="UserCache">
+      SELECT * FROM MyUser $whereSql$
+    </select>
+
+    <!--用来确认该用户名，或者该用户名和密码在数据库中是否存在-->
+    <select id="GetUserCount" resultClass="int" parameterClass="MyUser">
+      SELECT COUNT(Id) FROM MyUser WHERE 1=1
+      <dynamic>
+        <isNotNull prepend="AND" property="Username">
+          Username=#Username#
+        </isNotNull>
+        <isNotNull prepend="AND" property="Password">
+          Password=#Password#
+        </isNotNull>
+      </dynamic>
+    </select>
+
+    <!--为用户修改用户的基本信息，即修改手机号码-->
+    <update id="ChangeUserInfo" parameterClass="MyUser">
+      UPDATE MyUser SET PhoneNum = #PhoneNum# where Username = #Username#
+    </update>
+
+    <!--为用户修改密码-->
+    <update id="ChangeUserPassword" parameterClass="MyUser">
+      UPDATE MyUser SET Password = #Password# where Username = #Username#
+    </update>
+    
+    <!--删除-->
+    <delete id="DeleteUser" parameterClass="MyUser">
+      DELETE FROM TestUser WHERE Username=#Username#
+    </delete>
+
+    <!--为用户获取用户的基本信息，不含密码-->
+    <select id="GetUserInfo" parameterClass="MyUser" resultClass="MyUser">
+      SELECT Id,Username,PhoneNum,NewReply FROM MyUser WHERE Username=#Username#
+    </select>
+  </statements>
+</sqlMap>
