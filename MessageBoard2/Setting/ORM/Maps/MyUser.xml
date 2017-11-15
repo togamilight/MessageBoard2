@@ -3,15 +3,17 @@
   <!--别名-->
   <alias>
     <typeAlias alias="MyUser" type="MessageBoard2.Models.MyUser,MessageBoard2" />
+    <typeAlias alias="SelectPageInfo" type="MessageBoard2.Models.SelectPageInfo,MessageBoard2" />
   </alias>
   <!--缓存模型-->
   <cacheModels>
     <cacheModel id="UserCache" implementation="MEMORY">
       <flushInterval hours="24"/>
       <flushOnExecute statement="MyUser.AddUser"/>
-      <!--<flushOnExecute statement="MyUser.UpdateUser"/>-->
+      <flushOnExecute statement="MyUser.ChangeUserInfo"/>
       <flushOnExecute statement="MyUser.DeleteUser"/>
-      <!--<flushOnExecute statement="MyUser.DeleteUsers"/>-->
+      <flushOnExecute statement="MyUser.ChangeUserPassword"/>
+      <flushOnExecute statement="MyUser.ChangeUserInfoByAdmin"/>
       <property name="Type" value="WEAK"/>
     </cacheModel>
   </cacheModels>
@@ -29,6 +31,7 @@
         SELECT @@IDENTITY AS value
       </selectKey>
     </insert>
+    
     <!--根据条件语句whereSql获取所有对象-->
     <select id="GetUsersBySql" resultClass="MyUser" parameterClass="string"  cacheModel="UserCache">
       SELECT * FROM MyUser $whereSql$
@@ -47,9 +50,19 @@
       </dynamic>
     </select>
 
+    <!--根据条件查找用户的数量-->
+    <select id="GetUserCountBySql" resultClass="int" parameterClass="string">
+      SELECT COUNT(Id) FROM MyUser WHERE 1=1 $whereSql$
+    </select>
+
     <!--为用户修改用户的基本信息，即修改手机号码-->
     <update id="ChangeUserInfo" parameterClass="MyUser">
       UPDATE MyUser SET PhoneNum = #PhoneNum# where Username = #Username#
+    </update>
+
+    <!--为管理员修改用户的基本信息-->
+    <update id="ChangeUserInfoByAdmin" parameterClass="MyUser">
+      UPDATE MyUser SET Username = #Username#, Password = #Password#, PhoneNum = #PhoneNum# where Id = #Id#
     </update>
 
     <!--为用户修改密码-->
@@ -59,12 +72,17 @@
     
     <!--删除-->
     <delete id="DeleteUser" parameterClass="MyUser">
-      DELETE FROM TestUser WHERE Username=#Username#
+      DELETE FROM MyUser WHERE Username=#Username#
     </delete>
 
     <!--为用户获取用户的基本信息，不含密码-->
     <select id="GetUserInfo" parameterClass="MyUser" resultClass="MyUser">
       SELECT Id,Username,PhoneNum,NewReply FROM MyUser WHERE Username=#Username#
+    </select>
+
+    <!--根据分页信息都用户进行分页查询-->
+    <select id="GetUsersPageBySql" resultClass="MyUser" parameterClass="SelectPageInfo"  cacheModel="UserCache">
+      SELECT TOP $Count$ * FROM MyUser WHERE Id NOT IN (SELECT TOP $Min$ Id FROM MyUser WHERE 1=1 $WhereSql$) $WhereSql$
     </select>
   </statements>
 </sqlMap>

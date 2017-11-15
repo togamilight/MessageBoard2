@@ -1,0 +1,83 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ChangeAdminInfo</title>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            //验证表单
+            $("#ChangePswBtn").click(function () {
+                var errorInfo = "";     //记录错误信息
+                var oldPassword = $("#OldPassword").val();
+                var newPassword = $("#NewPassword").val();
+
+                if (oldPassword == "") {
+                    errorInfo += "请输入原密码 \n";
+                } else if (oldPassword.length >= 20) {
+                    errorInfo += "原密码不会超过20个字符！";
+                } else if (oldPassword.indexOf(" ") != -1) {
+                    errorInfo += "原密码不会含有空格 \n";
+                }
+
+                if (newPassword == "") {
+                    errorInfo += "请输入新密码 \n";
+                } else if (newPassword.length >= 20) {
+                    errorInfo += "新密码不能超过20个字符！";
+                } else if (newPassword.indexOf(" ") != -1) {
+                    errorInfo += "新密码不会含有空格 \n";
+                }
+
+                if (errorInfo != "") {
+                    alert(errorInfo);
+                } else {
+                    $("#Tip").text("...");
+                    var data = {
+                        oldPassword: oldPassword,
+                        newPassword: newPassword
+                    }
+                    //提交修改信息
+                    $.ajax({
+                        type: 'POST',
+                        data: data,
+                        url: '/MyAdminCenter/ChangeAdminPassword',
+                        success: function (r) {
+                            //显示提示信息
+                            $("#Tip").text(r.Tip);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    @Html.Partial("AdminHeader")
+    @Html.Partial("AdminCenterHeader")
+    <div style="text-align:center">
+        <h3 id="Tip"></h3>
+        <div style="text-align:center; display:flex; flex-direction:column; align-items:center" id="ChangePassword">
+            <h3>修改密码</h3>
+                <table>
+                    <tr>
+                        <td>原密码：</td>
+                        <td><input type="password" name="OldPassword" id="OldPassword" placeholder="请输入原密码" /></td>
+                    </tr>
+                    <tr>
+                        <td>新密码：</td>
+                        <td><input type="password" name="NewPassword" id="NewPassword" placeholder="请输入新密码" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><button id="ChangePswBtn">修改</button></td>
+                    </tr>
+                </table>
+        </div>
+    </div>
+</body>
+</html>

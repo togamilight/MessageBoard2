@@ -10,9 +10,13 @@ namespace MessageBoard2.Service.Interface {
         int AddUser(MyUser user);
         bool CheckUsername(MyUser user);
         bool CheckUserPassword(MyUser user);
+        int GetUserCountBySql(string whereSql);
         int ChangeUserInfo(MyUser user);
+        int ChangeUserInfoByAdmin(MyUser user);
         int ChangeUserPassword(MyUser user);
         IList<MyUser> GetAllUser();
+        IList<MyUser> GetUsersBySql(string whereSql);
+        IList<MyUser> GetUsersPageBySql(SelectPageInfo info);
         int DeleteUser(MyUser user);
         MyUser GetUserInfo(MyUser user);
     }

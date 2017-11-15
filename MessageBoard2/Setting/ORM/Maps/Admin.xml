@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="Admin" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!--别名-->
+  <alias>
+    <typeAlias alias="Admin" type="MessageBoard2.Models.Admin,MessageBoard2" />
+  </alias>
+  <!--缓存模型-->
+  <cacheModels>
+    <cacheModel id="AdminCache" implementation="MEMORY">
+      <flushInterval hours="24"/>
+      <flushOnExecute statement="Admin.AddAdmin"/>
+      <flushOnExecute statement="Admin.ChangeAdminPassword"/>
+      <property name="Type" value="WEAK"/>
+    </cacheModel>
+  </cacheModels>
+  
+  <!--字段映射-->
+  <resultMaps>
+  </resultMaps>
+  
+  <statements>
+    <!--添加-->
+    <insert id="AddAdmin" parameterClass="Admin">
+      INSERT INTO Admin(AdminName,Password) VALUES(#AdminName#,#Password#)
+      <!--插入数据之后，model对象的主属性得到自增主键的新值-->
+      <selectKey resultClass="int" type="post" property="Id">
+        SELECT @@IDENTITY AS value
+      </selectKey>
+    </insert>
+
+    <!--用来确认该管理员名，或者该管理员名和密码在数据库中是否存在-->
+    <select id="GetAdminCount" resultClass="int" parameterClass="Admin">
+      SELECT COUNT(Id) FROM Admin WHERE 1=1
+      <dynamic>
+        <isNotNull prepend="AND" property="AdminName">
+          AdminName=#AdminName#
+        </isNotNull>
+        <isNotNull prepend="AND" property="Password">
+          Password=#Password#
+        </isNotNull>
+      </dynamic>
+    </select>
+
+    <!--为管理员修改密码-->
+    <update id="ChangeAdminPassword" parameterClass="Admin">
+      UPDATE Admin SET Password = #Password# where AdminName = #AdminName#
+    </update>
+  
+  </statements>
+</sqlMap>

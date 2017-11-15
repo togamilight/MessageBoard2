@@ -1,0 +1,340 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script type="text/javascript" src="~/jquery_easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="~/jquery_easyui/jquery.easyui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="~/jquery_easyui/themes/icon.css" /> 
+    <link rel="stylesheet" type="text/css" href="~/jquery_easyui/themes/default/easyui.css"/>
+
+    <script type="text/javascript">
+        var getDataURL = "/MyUserManage/GetUserDataGridList";
+        $(function () {
+            $("#UserDG").datagrid({
+                url: getDataURL,
+                idField: 'Id',
+                //fit: true,
+                singleSelect: true,
+                toolbar: "#ToolBar",
+                //checkOnSelect: false,
+                //selectOnCheck: false,
+                pagination: true,
+                rownumbers: true,
+                fitColumns: true,
+                method: "POST",
+                contentType: "application/json",
+                customLoad: false,
+                autoRowHeight: false
+            });
+
+            //搜索
+            $("#SearchBtn").click(function () {
+                var errorInfo = "";     //记录错误信息
+                var keyWord = $("#KeyWord").val();
+                if (keyWord.length >= 20) {
+                    errorInfo += "关键字不能超过20个字符 \n";
+                } else if (keyWord.indexOf(" ") != -1) {
+                    errorInfo += "关键字不能含有空格 \n";
+                }
+                if (errorInfo != "") {
+                    alert(errorInfo);
+                } else {
+                    var searchObject = { KeyWord: keyWord };
+                    $("#UserDG").datagrid('load', searchObject);
+                }
+            });
+
+            //新增用户
+            $("#AddBtn").click(function () {
+                //定义对话框按钮
+                var buttonsObj = [{
+                    text: "新增",
+                    iconCls: "icon-add",
+                    handler: function () { AddUser(); }
+                }, {
+                    text: "关闭",
+                    iconCls: "icon-cancel",
+                    handler: function () { dia.dialog("close"); }
+                }];
+                //开启对话框
+                var dia = $("#AddUserDiv").dialog({ "title": "新增用户", buttons: buttonsObj }).dialog("open");
+            });
+
+            //编辑用户
+            $("#EditBtn").click(function () {
+                //取得选中行
+                var user = $('#UserDG').datagrid('getSelected');
+                if (user) {
+                    //将原数据设置到编辑输入框中
+                    $("#EditOldUsername").val(user.Username);
+                    $("#EditId").val(user.Id);
+                    $("#EditUsername").val(user.Username);
+                    $("#EditPassword").val(user.Password);
+                    $("#EditPhoneNum").val(user.PhoneNum);
+                    $("#EditSignDate").val(DateTimeFormatter(user.SignDate));
+                    //定义对话框按钮
+                    var buttonsObj = [{
+                        text: "修改",
+                        iconCls: "icon-edit",
+                        handler: function () { EditUser(); }
+                    }, {
+                        text: "关闭",
+                        iconCls: "icon-cancel",
+                        handler: function () { dia.dialog("close"); }
+                    }];
+                    //开启对话框
+                    var dia = $("#EditUserDiv").dialog({ "title": "编辑用户", buttons: buttonsObj }).dialog("open");
+                } else {
+                    alert("未选中任何数据");
+                }
+                
+            });
+
+            //编辑用户
+            $("#DeleteBtn").click(function () {
+                //取得选中行
+                var user = $('#UserDG').datagrid('getSelected');
+                if (user) {
+                    if (confirm("确定删除该用户吗？")) {
+                        //获取用户名
+                        var data = {
+                            Username: user.Username
+                        };
+                        $.ajax({
+                            type: 'POST',
+                            url: '/MyUserManage/DeleteUser',
+                            data: data,
+                            async: false,   //取消异步，改为同步
+                            success: function (r) {
+                                $("#UserDG").datagrid("reload");
+                            }
+                        });
+                    }
+                } else {
+                    alert("未选中任何数据");
+                }
+
+            });
+        });
+
+        function DateTimeFormatter(value) {
+            if (value == undefined) {
+                return "";
+            }
+            //json格式的时间转换成js格式的时间
+            var dateValue = eval('new ' + eval(value).source);
+            return dateValue.format("yyyy/MM/dd");
+        }
+
+        //js的日期格式转换
+        Date.prototype.format = function (format) {
+            var args = {
+                "M+": this.getMonth() + 1,
+                "d+": this.getDate(),
+                "h+": this.getHours(),
+                "m+": this.getMinutes(),
+                "s+": this.getSeconds(),
+                "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
+                "S": this.getMilliseconds()
+            };
+            if (/(y+)/.test(format))
+                format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var i in args) {
+                var n = args[i];
+                if (new RegExp("(" + i + ")").test(format))
+                    format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? n : ("00" + n).substr(("" + n).length));
+            }
+            return format;
+        };
+
+        //添加新用户
+        function AddUser() {
+            var errorInfo = "";     //记录错误信息
+            var username = $("#Username").val();
+            var password = $("#Password").val();
+            var phoneNum = $("#PhoneNum").val();
+            if (username == "") {
+                errorInfo += "请输入用户名 \n";
+            } else if (username.length >= 20) {
+                errorInfo += "用户名不能超过20个字符 \n";
+            } else if (username.indexOf(" ") != -1) {
+                errorInfo += "用户名不能含有空格 \n";
+            }
+
+            if (password == "") {
+                errorInfo += "请输入密码 \n";
+            } else if (password.length >= 20) {
+                errorInfo += "密码不能超过20个字符 \n";
+            } else if (password.indexOf(" ") != -1) {
+                errorInfo += "密码不能含有空格 \n";
+            }
+
+            if (phoneNum == "") {
+                errorInfo += "请输入手机号码 \n";
+            } else if (!(/^1[34578]\d{9}$/.test(phoneNum))) {   //用正则表达式检查手机号格式
+                errorInfo += "请输入正确的手机号码 \n";
+            }
+
+            if (errorInfo != "") {
+                alert(errorInfo);
+            } else {
+                var data = {
+                    Username : username,
+                    Password: password,
+                    PhoneNum: phoneNum
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: '/MyUserManage/AddUser',
+                    data: data,
+                    async: false,   //取消异步，改为同步
+                    success: function (r) {
+                        var result = r.result;
+                        if (result == "Fail") {
+                            alert(r.tip);
+                        } else {
+                            $("#UserDG").datagrid("reload");
+                            $("#AddUserDiv").dialog("close");
+                        }
+                    }
+                });
+            }
+        }
+
+        //编辑用户
+        function EditUser(){
+            var errorInfo = "";     //记录错误信息
+            var id = $("#EditId").val();
+            var oldUsername = $("#EditOldUsername").val();
+            var username = $("#EditUsername").val();
+            var password = $("#EditPassword").val();
+            var phoneNum = $("#EditPhoneNum").val();
+            if (username == "") {
+                errorInfo += "请输入用户名 \n";
+            } else if (username.length >= 20) {
+                errorInfo += "用户名不能超过20个字符 \n";
+            } else if (username.indexOf(" ") != -1) {
+                errorInfo += "用户名不能含有空格 \n";
+            }
+
+            if (password == "") {
+                errorInfo += "请输入密码 \n";
+            } else if (password.length >= 20) {
+                errorInfo += "密码不能超过20个字符 \n";
+            } else if (password.indexOf(" ") != -1) {
+                errorInfo += "密码不能含有空格 \n";
+            }
+
+            if (phoneNum == "") {
+                errorInfo += "请输入手机号码 \n";
+            } else if (!(/^1[34578]\d{9}$/.test(phoneNum))) {   //用正则表达式检查手机号格式
+                errorInfo += "请输入正确的手机号码 \n";
+            }
+
+            if (errorInfo != "") {
+                alert(errorInfo);
+            } else{
+                var data = {
+                    OldUsername: oldUsername,
+                    Id: id,
+                    Username: username,
+                    Password: password,
+                    PhoneNum: phoneNum
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/MyUserManage/EditUser',
+                    data: data,
+                    async: false,   //取消异步，改为同步
+                    success: function (r) {
+                        var result = r.result;
+                        if (result == "Fail") {
+                            alert(r.tip);
+                        } else {
+                            $("#UserDG").datagrid("reload");
+                            $("#EditUserDiv").dialog("close");
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+    @Html.Partial("AdminHeader")
+    @Html.Partial("MyBackMenuHeader")
+    <table id="UserDG" title="用户列表">
+        <thead>
+            <tr>
+                <th data-options="field:'Id',width:100">用户Id</th>
+                <th data-options="field:'Username',width:100">用户名</th>
+                <th data-options="field:'Password',width:100">密码</th>
+                <th data-options="field:'PhoneNum',width:100">手机号码</th>
+                <th data-options="field:'SignDate', formatter:DateTimeFormatter,width:100">注册日期</th>
+            </tr>
+        </thead>
+    </table>
+
+    <div id="ToolBar">
+        <div style="margin-top:10px; margin-left:10px">
+                <input type="text" name="KeyWord" id="KeyWord" placeholder="请输入用户名的关键字" />
+                <a id="SearchBtn" href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-search" plain="true">搜索</a>
+        </div>
+        <a id="AddBtn" href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true">添加</a>
+        <a id="DeleteBtn" href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除</a>
+        <a id="EditBtn" href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true">编辑</a>
+    </div>
+
+    <div id="AddUserDiv" data-options="iconCls:'icon-add',modal:true" style="text-align:center; display:none;">
+        <h3>新增用户</h3>
+            <table>
+                <tr>
+                    <td>用户名：</td>
+                    <td><input type="text" name="Username" id="Username" placeholder="请输入用户名" /></td>
+                </tr>
+                <tr>
+                    <td>密码：</td>
+                    <td><input type="text" name="Password" id="Password" placeholder="请输入密码" /></td>
+                </tr>
+                <tr>
+                    <td>手机号码：</td>
+                    <td><input type="text" name="PhoneNum" id="PhoneNum" placeholder="请输入手机号码" /></td>
+                </tr>
+            </table>
+    </div>
+
+    <div id="EditUserDiv" data-options="iconCls:'icon-edit',modal:true" style="text-align:center; display:none; ">
+        <h3>修改用户信息</h3>
+            <input type="text" name="OldUsername" id="EditOldUsername" style="display:none" />
+            <table>
+                <tr>
+                    <td>用户Id：</td>
+                    <td><input type="text" readonly name="Id" id="EditId" /></td>
+                </tr>
+                <tr>
+                    <td>用户名：</td>
+                    <td><input type="text" name="Username" id="EditUsername" placeholder="请输入用户名" /></td>
+                </tr>
+                <tr>
+                    <td>密码：</td>
+                    <td><input type="text" name="Password" id="EditPassword" placeholder="请输入密码" /></td>
+                </tr>
+                <tr>
+                    <td>手机号码：</td>
+                    <td><input type="text" name="PhoneNum" id="EditPhoneNum" placeholder="请输入手机号码" /></td>
+                </tr>
+                <tr>
+                    <td>注册日期：</td>
+                    <td><input type="text" name="SignDate" id="EditSignDate" readonly /></td>
+                </tr>
+            </table>
+    </div>
+</body>
+</html>

@@ -32,6 +32,17 @@ namespace MessageBoard2.Dao {
             return users;
         }
 
+        public IList<MyUser> GetUsersPageBySql(SelectPageInfo info, ISqlMapper sqlMapper) {
+            IList<MyUser> users = new List<MyUser>();
+            try {
+                users = sqlMapper.QueryForList<MyUser>("MyUser.GetUsersPageBySql", info);
+            }
+            catch (Exception) {
+                throw;
+            }
+            return users;
+        }
+
         public int GetUserCount(MyUser user, ISqlMapper sqlMapper) {
             int count = 0;
             try {
@@ -43,10 +54,32 @@ namespace MessageBoard2.Dao {
             return count;
         }
 
+        public int GetUserCountBySql(string whereSql, ISqlMapper sqlMapper) {
+            int count = 0;
+            try {
+                count = sqlMapper.QueryForObject<int>("MyUser.GetUserCountBySql", whereSql);
+            }
+            catch (Exception) {
+                throw;
+            }
+            return count;
+        }
+
         public int ChangeUserInfo(MyUser user, ISqlMapper sqlMapper) {
             int count = 0;
             try {
                 count = sqlMapper.Update("MyUser.ChangeUserInfo", user);
+            }
+            catch (Exception) {
+                throw;
+            }
+            return count;
+        }
+
+        public int ChangeUserInfoByAdmin(MyUser user, ISqlMapper sqlMapper) {
+            int count = 0;
+            try {
+                count = sqlMapper.Update("MyUser.ChangeUserInfoByAdmin", user);
             }
             catch (Exception) {
                 throw;

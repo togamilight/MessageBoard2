@@ -54,10 +54,33 @@ namespace MessageBoard2.Service {
             return true;
         }
 
+        //得到用户表的数据总条数
+        public int GetUserCountBySql(string whereSql) {
+            int count = 0;
+            try {
+                count = MyUserDao.GetUserCountBySql(whereSql, DataMapper.Instance);
+            }
+            catch (Exception) {
+                throw;
+            }
+            return count;
+        }
+
         public int ChangeUserInfo(MyUser user) {
             int count = 0;
             try {
                 count = MyUserDao.ChangeUserInfo(user, DataMapper.Instance);
+            }
+            catch (Exception) {
+                throw;
+            }
+            return count;
+        }
+
+        public int ChangeUserInfoByAdmin(MyUser user) {
+            int count = 0;
+            try {
+                count = MyUserDao.ChangeUserInfoByAdmin(user, DataMapper.Instance);
             }
             catch (Exception) {
                 throw;
@@ -93,6 +116,29 @@ namespace MessageBoard2.Service {
             try {
                 //条件为空字符串，得到所有
                 users = MyUserDao.GetUsersBySql("", DataMapper.Instance);
+            }
+            catch (Exception) {
+                throw;
+            }
+            return users;
+        }
+
+        public IList<MyUser> GetUsersBySql(string whereSql) {
+            IList<MyUser> users = new List<MyUser>();
+            try {
+                //条件为空字符串，得到所有
+                users = MyUserDao.GetUsersBySql(whereSql, DataMapper.Instance);
+            }
+            catch (Exception) {
+                throw;
+            }
+            return users;
+        }
+
+        public IList<MyUser> GetUsersPageBySql(SelectPageInfo info) {
+            IList<MyUser> users = new List<MyUser>();
+            try {
+                users = MyUserDao.GetUsersPageBySql(info, DataMapper.Instance);
             }
             catch (Exception) {
                 throw;
