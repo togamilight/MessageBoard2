@@ -38,3 +38,30 @@ function DateTimeFormatter(value) {
     var dateValue = eval('new ' + eval(value).source);
     return dateValue.format("yyyy/MM/dd hh:mm:ss");
 }
+
+//根据id和url取得留言及回复内容并填充编辑留言框
+function GetMessageAndFillEditDiv(id, url) {
+    var data = {
+        Id: id
+    }
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: data,
+        success: function (r) {
+            $("#EditId").val(r.Id);
+            $("#EditIsPublic").text(r.IsPublic);
+            $("#EditTitle").val(r.Title);
+            $("#EditUsername").text(r.Username);
+            $("#EditMsgDate").text(DateTimeFormatter(r.DateTime));
+            $("#EditContent").val(r.Content);
+            //回复
+            var replies = r.Replies;
+            var html = "";
+            for (var i = 0; i < replies.length; i++) {
+                html += "<div class='ReplyDiv'><div><span class='AdminName'>" + replies[i].AdminName + "</span><span class='ReplyDate'>" + DateTimeFormatter(replies[i].DateTime) + "</span></div><div class='ReplyContent'>" + replies[i].Content + "</div></div>";
+            }
+            $("#RepliesDiv").html(html);
+        }
+    });
+}

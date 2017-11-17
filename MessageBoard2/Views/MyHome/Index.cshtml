@@ -8,11 +8,118 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
+    <title>MessageManage</title>
+    <script type="text/javascript" src="~/jquery_easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="~/jquery_easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="~/MyJavaScript/myJS.js"></script>
+    <link rel="stylesheet" type="text/css" href="~/jquery_easyui/themes/icon.css" />
+    <link rel="stylesheet" type="text/css" href="~/jquery_easyui/themes/default/easyui.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/myCSS.css" />
+
+    <script type="text/javascript">
+        var getDataURL = "/MyHome/GetMessageDataGridList";
+        var getMsgURL = "/MyHome/GetMessage";
+        $(function () {
+            $("#MessageDG").datagrid({
+                url: getDataURL,
+                idField: 'Id',
+                //fit: true,
+                singleSelect: true,
+                toolbar: "#ToolBar",
+                //checkOnSelect: false,
+                //selectOnCheck: false,
+                pagination: true,
+                rownumbers: true,
+                fitColumns: true,
+                method: "POST",
+                contentType: "application/json",
+                customLoad: false,
+                autoRowHeight: false
+            });
+
+            //查看留言
+            $("#EditBtn").click(function () {
+                isChanged = false;
+                //取得选中行
+                var msg = $('#MessageDG').datagrid('getSelected');
+                if (msg) {
+                    //得到留言id，返回服务器查找留言详情和回复
+                    var id = msg.Id;
+                    GetMessageAndFillEditDiv(id, getMsgURL);
+                    //定义对话框按钮
+                    var buttonsObj = [{
+                        text: "关闭",
+                        iconCls: "icon-cancel",
+                        handler: function () {
+                            //将textarea的值置为空，下次打开才能正确显示实际的值，不然输入后就会一直显示输入的值
+                            $("#EditContent").val("");
+                            dia.dialog("close");
+                        }
+                    }];
+                    //开启对话框
+                    var dia = $("#EditMessageDiv").dialog({ "title": "查看留言", buttons: buttonsObj }).dialog("open");
+                } else {
+                    alert("未选中任何数据");
+                }
+            });
+        });
+
+
+        //搜索
+        function SearchMessage(value) {
+            var errorInfo = "";     //记录错误信息
+            var keyWord = value;
+            if (keyWord.length >= 20) {
+                errorInfo += "关键字不能超过20个字符 \n";
+            } else if (keyWord.indexOf(" ") != -1) {
+                errorInfo += "关键字不能含有空格 \n";
+            }
+            if (errorInfo != "") {
+                alert(errorInfo);
+            } else {
+                var searchObject = {
+                    KeyWord: keyWord
+                };
+                $("#MessageDG").datagrid('load', searchObject);
+            }
+        }
+    </script>
 </head>
 <body>
     @{Html.RenderAction("GetUserHeader", "MyUser");}
-    <div> 
+    <h3 style="text-align:center">首页</h3>
+    <table id="MessageDG" title="已公开留言列表">
+        <thead>
+            <tr>
+                <th data-options="field:'Id',width:100">留言Id</th>
+                <th data-options="field:'Title',width:100">标题</th>
+                <th data-options="field:'Username',width:100">用户名</th>
+                <th data-options="field:'Content',width:200">内容</th>
+                <th data-options="field:'DateTime', formatter:DateTimeFormatter,width:100">留言日期</th>
+                <th data-options="field:'IsPublic',width:100">是否公开</th>
+                <th data-options="field:'ReplyNum',width:100">回复数</th>
+            </tr>
+        </thead>
+    </table>
+
+    <div id="ToolBar">
+        <!--easyui的搜索框-->
+        <input id="KeyWord" class="easyui-searchbox" style="width:300px"
+               data-options="searcher:SearchMessage,prompt:'请输入搜索关键字'" />
+        <br />
+
+        <a id="EditBtn" href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true">查看</a>
+    </div>
+
+    <div id="EditMessageDiv" data-options="iconCls:'icon-edit',modal:true" style="display:none; width:800px;height:650px; ">
+        <div class="MsgDiv">
+            <input type="text" id="EditTitle" value="" readonly/>
+            <div class="AuthorInfoDiv"><span class="UserName" id="EditUsername"></span><span class="MsgDate" id="EditMsgDate"></span></div>
+            <textarea rows="12" style="margin-top:0" id="EditContent" readonly></textarea>
+            <h4>回复</h4>
+            <div id="RepliesDiv" class="RepliesDiv">
+            </div>
+        </div>
     </div>
 </body>
 </html>

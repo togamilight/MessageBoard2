@@ -21,7 +21,7 @@ namespace MessageBoard2.Controllers
             //为搜索拼接条件字符串
             string sql = "";
             if (KeyWord != "") {
-                sql = "AND Username LIKE '%" + KeyWord + "%'";
+                sql = "AND Username LIKE N'%" + KeyWord + "%'";
             }
 
             //得到数据总条数
@@ -41,10 +41,10 @@ namespace MessageBoard2.Controllers
         public ActionResult AddUser(MyUser user) {
             bool result = MyUserService.CheckUsername(new MyUser() { Username = user.Username });
             if (result) {
-                return Json(new { result = "Fail", tip = "用户名已存在" });
+                return Json(new { result = false, tip = "用户名已存在" });
             }
             MyUserService.AddUser(user);
-            return Json(new { result = "Success", tip = "新增用户成功" });
+            return Json(new { result = true, tip = "新增用户成功" });
         }
 
         [HttpPost]
@@ -53,20 +53,20 @@ namespace MessageBoard2.Controllers
             if(OldUsername != user.Username) {
                 bool result = MyUserService.CheckUsername(new MyUser() { Username = user.Username });
                 if (result) {
-                    return Json(new { result = "Fail", tip = "用户名已存在" });
+                    return Json(new { result = false, tip = "用户名已存在" });
                 }
             }
             MyUserService.ChangeUserInfoByAdmin(user);
-            return Json(new { result = "Success", tip = "修改用户成功" });
+            return Json(new { result = true, tip = "修改用户成功" });
         }
 
         [HttpPost]
         public ActionResult DeleteUser(MyUser user) {
             int count = MyUserService.DeleteUser(user);
             if(count > 0) {
-                return Json(new { result = "Success", tip = "删除用户成功" });
+                return Json(new { result = true, tip = "删除用户成功" });
             }else {
-                return Json(new { result = "Fail", tip = "由于未知原因, 删除用户失败" });
+                return Json(new { result = false, tip = "由于未知原因, 删除用户失败" });
             }
         }
     }

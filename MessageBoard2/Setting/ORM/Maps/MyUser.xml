@@ -15,6 +15,8 @@
       <flushOnExecute statement="MyUser.ChangeUserPassword"/>
       <flushOnExecute statement="MyUser.ChangeUserInfoByAdmin"/>
       <flushOnExecute statement="Message.ClearNewReply"/>
+      <flushOnExecute statement="Message.DeleteMessage"/>
+      <flushOnExecute statement="Reply.AddReply"/>
       <property name="Type" value="WEAK"/>
     </cacheModel>
   </cacheModels>
@@ -73,7 +75,7 @@
       UPDATE MyUser SET Password = #Password# where Username = #Username#
     </update>
     
-    <!--删除-->
+    <!--删除，已在数据库定义了外键的级联更新和删除，会自动删除对应的留言和回复-->
     <delete id="DeleteUser" parameterClass="MyUser">
       DELETE FROM MyUser WHERE Username=#Username#
     </delete>

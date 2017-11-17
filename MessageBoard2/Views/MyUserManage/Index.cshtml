@@ -168,7 +168,7 @@
                     async: false,   //取消异步，改为同步
                     success: function (r) {
                         var result = r.result;
-                        if (result == "Fail") {
+                        if (!result) {
                             alert(r.tip);
                         } else {
                             $("#UserDG").datagrid("reload");
@@ -226,7 +226,7 @@
                     async: false,   //取消异步，改为同步
                     success: function (r) {
                         var result = r.result;
-                        if (result == "Fail") {
+                        if (!result) {
                             alert(r.tip);
                         } else {
                             $("#UserDG").datagrid("reload");

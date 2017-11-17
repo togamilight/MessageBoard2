@@ -31,10 +31,10 @@ namespace MessageBoard2.Controllers
             string sql = "";
             if (KeyWord != "") {
                 if(KeyWordType == "TitleOrContent") {
-                    sql = "AND (Title LIKE '%" + KeyWord + "%' OR Content LIKE '%" + KeyWord + "%')";
+                    sql = "AND (Title LIKE N'%" + KeyWord + "%' OR Content LIKE N'%" + KeyWord + "%')";
                 }
                 else if(KeyWordType == "Username") {
-                    sql = "AND Username LIKE '%" + KeyWord + "%'";
+                    sql = "AND Username LIKE N'%" + KeyWord + "%'";
                 }
                 
             }
@@ -56,10 +56,10 @@ namespace MessageBoard2.Controllers
         public ActionResult SwitchMessageState(Message msg) {
             int count = MessageService.SwitchMessageState(msg);
             if (count > 0) {
-                return Json(new { result = "Success", tip = "切换状态成功" });
+                return Json(new { result = true, tip = "切换状态成功" });
             }
             else {
-                return Json(new { result = "Fail", tip = "由于未知原因, 切换状态失败" });
+                return Json(new { result = false, tip = "由于未知原因, 切换状态失败" });
             }
         }
 
@@ -67,10 +67,10 @@ namespace MessageBoard2.Controllers
         public ActionResult ChangeMessage(Message msg) {
             int count = MessageService.ChangeMessage(msg);
             if (count > 0) {
-                return Json(new { result = "Success", tip = "修改成功" });
+                return Json(new { result = true, tip = "修改成功" });
             }
             else {
-                return Json(new { result = "Fail", tip = "由于未知原因, 修改失败" });
+                return Json(new { result = false, tip = "由于未知原因, 修改失败" });
             }
         }
 
@@ -78,10 +78,10 @@ namespace MessageBoard2.Controllers
         public ActionResult DeleteMessage(Message msg) {
             int count = MessageService.DeleteMessage(msg);
             if (count > 0) {
-                return Json(new { result = "Success", tip = "删除成功" });
+                return Json(new { result = true, tip = "删除成功" });
             }
             else {
-                return Json(new { result = "Fail", tip = "由于未知原因, 删除失败" });
+                return Json(new { result = false, tip = "由于未知原因, 删除失败" });
             }
         }
 
@@ -90,10 +90,10 @@ namespace MessageBoard2.Controllers
             reply.AdminName = (string)Session["AccountName"];
             int count = ReplyService.AddReply(reply);
             if (count > 0) {
-                return Json(new { result = "Success", tip = "回复成功" });
+                return Json(new { result = true, tip = "回复成功" });
             }
             else {
-                return Json(new { result = "Fail", tip = "由于未知原因, 回复失败" });
+                return Json(new { result = false, tip = "由于未知原因, 回复失败" });
             }
         }
     }

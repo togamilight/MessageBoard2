@@ -15,6 +15,8 @@
       <flushOnExecute statement="Message.ChangeMessage"/>
       <flushOnExecute statement="Message.SwitchMessageState"/>
       <flushOnExecute statement="Message.ClearNewReply"/>
+      <flushOnExecute statement="MyUser.DeleteUser"/>
+      <flushOnExecute statement="MyUser.ChangeUserInfoByAdmin"/>
       <flushOnExecute statement="Reply.AddReply"/>
       <property name="Type" value="WEAK"/>
     </cacheModel>
@@ -60,7 +62,7 @@
 
     <!--根据分页信息对留言进行分页查询-->
     <select id="GetMessagesPageBySql" resultClass="Message" parameterClass="SelectPageInfo"  cacheModel="MessageCache">
-      SELECT TOP $Count$ * FROM Message WHERE Id NOT IN (SELECT TOP $Min$ Id FROM Message WHERE 1=1 $WhereSql$) $WhereSql$ ORDER BY DateTime DESC
+      SELECT TOP $Count$ * FROM Message WHERE Id NOT IN (SELECT TOP $Min$ Id FROM Message WHERE 1=1 $WhereSql$ ORDER BY DateTime DESC) $WhereSql$ ORDER BY DateTime DESC
     </select>
 
     <!--删除,已在数据库写好触发器和级联更新删除，可以自动更新MyUser表和Reply表-->
@@ -80,11 +82,11 @@
     </update>
 
     <!--获取留言，包括对应的回复-->
-    <select id="GetMessage" parameterClass="Message" resultMap="MessageResult">
+    <select id="GetMessage" parameterClass="Message" resultMap="MessageResult" cacheModel="MessageCache">
       SELECT Message.* FROM Message WHERE Message.Id = #Id# ;
     </select>
     <!--取得留言对应的回复-->
-    <select id="GetReplies" parameterClass="int" resultClass="MessageBoard2.Models.Reply">
+    <select id="GetReplies" parameterClass="int" resultClass="MessageBoard2.Models.Reply" cacheModel="MessageCache">
       SELECT * FROM Reply WHERE MessageId=#value#
     </select>
 

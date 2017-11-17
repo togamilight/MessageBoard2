@@ -1,4 +1,5 @@
-﻿using MessageBoard2.Dao.Interface;
+﻿using IBatisNet.DataMapper;
+using MessageBoard2.Dao.Interface;
 using MessageBoard2.DataMapper.Interface;
 using MessageBoard2.Models;
 using MessageBoard2.Service.Interface;
@@ -11,6 +12,18 @@ namespace MessageBoard2.Service {
     public class MessageService : IMessageService{
         public IMapper DataMapper { get; set; }
         public IMessageDao MessageDao { get; set; }
+
+        public int AddMessage(Message msg) {
+            int id = 0;
+            msg.DateTime = DateTime.Now;
+            try {
+                id = MessageDao.AddMessage(msg, DataMapper.Instance);
+            }
+            catch (Exception) {
+                throw;
+            }
+            return id;
+        }
 
         public Message GetMessage(Message msg) {
             try {
@@ -72,6 +85,24 @@ namespace MessageBoard2.Service {
                 count = MessageDao.DeleteMessage(msg, DataMapper.Instance);
             }
             catch (Exception) {
+                throw;
+            }
+            return count;
+        }
+
+        public int ClearNewReply(Message msg) {
+            int count = 0;
+            ISqlMapper sqlMapper = DataMapper.Instance;
+            try {
+                //开启事务
+                sqlMapper.BeginTransaction();
+                count = MessageDao.ClearNewReply(msg, sqlMapper);
+                //提交事务
+                sqlMapper.CommitTransaction();
+            }
+            catch (Exception) {
+                //回滚事务
+                sqlMapper.RollBackTransaction();
                 throw;
             }
             return count;

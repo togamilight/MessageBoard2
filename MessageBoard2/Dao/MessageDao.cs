@@ -8,6 +8,17 @@ using System.Web;
 
 namespace MessageBoard2.Dao {
     public class MessageDao : IMessageDao {
+        public int AddMessage(Message msg, ISqlMapper sqlMapper) {
+            int id = 0;
+            try {
+                id = Convert.ToInt32(sqlMapper.Insert("Message.AddMessage", msg));
+            }
+            catch (Exception) {
+                throw;
+            }
+            return id;
+        }
+
         public Message GetMessage(Message msg, ISqlMapper sqlMapper) {
             try {
                 msg = sqlMapper.QueryForObject<Message>("Message.GetMessage", msg);
@@ -67,6 +78,17 @@ namespace MessageBoard2.Dao {
             int count = 0;
             try {
                 count = sqlMapper.Delete("Message.DeleteMessage", msg);
+            }
+            catch (Exception) {
+                throw;
+            }
+            return count;
+        }
+
+        public int ClearNewReply(Message msg, ISqlMapper sqlMapper) {
+            int count = 0;
+            try {
+                count = sqlMapper.Update("Message.ClearNewReply", msg);
             }
             catch (Exception) {
                 throw;
