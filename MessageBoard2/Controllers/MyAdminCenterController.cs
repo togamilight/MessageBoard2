@@ -14,11 +14,13 @@ namespace MessageBoard2.Controllers
     {
         public IAdminService AdminService { get; set; }
 
+        //修改密码页面
         public ActionResult ChangeAdminInfo(string message = "") {
             ViewData["Message"] = message;
             return View("ChangeAdminInfo");
         }
 
+        //修改密码
         [HttpPost]
         public ActionResult ChangeAdminPassword(string oldPassword, string newPassword) {
             string adminName = (string)Session["AccountName"];
@@ -40,12 +42,14 @@ namespace MessageBoard2.Controllers
             return View("SignUp");
         }
 
+        //确认管理员名是否重复
         [HttpPost]
         public ActionResult CheckAdminName(string AdminName) {
             bool result = AdminService.CheckAdminName(new Admin() { AdminName = AdminName});
             return Json(new { isUnique = !result });
         }
 
+        //注册管理员
         [HttpPost]
         public ActionResult DoSignUp(Admin admin) {
             AdminService.AddAdmin(admin);

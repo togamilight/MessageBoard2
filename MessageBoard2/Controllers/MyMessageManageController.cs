@@ -15,16 +15,19 @@ namespace MessageBoard2.Controllers
         public IMessageService MessageService { get; set; }
         public IReplyService ReplyService { get; set; }
 
+        //主页面
         public ActionResult Index() {
             return View();
         }
 
+        //得到某条留言的详细信息，包括回复
         [HttpPost]
         public ActionResult GetMessage(Message msg) {
             msg = MessageService.GetMessage(msg);
             return Json(msg);
         }
 
+        //得到留言的分页数据
         [HttpPost]
         public ActionResult GetMessageDataGridList(int page = 1, int rows = 10, string KeyWord = "", string KeyWordType = "TitleOrContent") {
             //为搜索拼接条件字符串
@@ -52,6 +55,7 @@ namespace MessageBoard2.Controllers
             return Json(new { total = total, rows = msgs, page = page });
         }
 
+        //切换留言的公开状态
         [HttpPost]
         public ActionResult SwitchMessageState(Message msg) {
             int count = MessageService.SwitchMessageState(msg);
@@ -63,6 +67,7 @@ namespace MessageBoard2.Controllers
             }
         }
 
+        //修改留言
         [HttpPost]
         public ActionResult ChangeMessage(Message msg) {
             int count = MessageService.ChangeMessage(msg);
@@ -74,6 +79,7 @@ namespace MessageBoard2.Controllers
             }
         }
 
+        //删除留言
         [HttpPost]
         public ActionResult DeleteMessage(Message msg) {
             int count = MessageService.DeleteMessage(msg);
@@ -85,6 +91,7 @@ namespace MessageBoard2.Controllers
             }
         }
 
+        //新增回复
         [HttpPost]
         public ActionResult AddReply(Reply reply) {
             reply.AdminName = (string)Session["AccountName"];

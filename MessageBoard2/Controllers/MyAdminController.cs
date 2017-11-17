@@ -12,6 +12,7 @@ namespace MessageBoard2.Controllers
     {
         public IAdminService AdminService { get; set; }
 
+        //登录页面
         public ActionResult Login(string message = "") {
             //已经登录时不能登录
             if (Session["AccountStatus"] != null && (MyAccountStatus)Session["AccountStatus"] == MyAccountStatus.Admin) {
@@ -21,6 +22,7 @@ namespace MessageBoard2.Controllers
             return View("Login");
         }
 
+        //登录
         [HttpPost]
         public ActionResult DoLogin(Admin admin) {
             bool result = AdminService.CheckAdminPassword(admin);
@@ -35,11 +37,12 @@ namespace MessageBoard2.Controllers
             }
         }
 
+        //注销
         public ActionResult Logout() {
             //注销，修改Session中的信息
             Session["AccountStatus"] = MyAccountStatus.None;
             Session["AccountName"] = "";
-
+            //跳转到登录页面
             return RedirectToAction("Login", new { message = "注销成功" });
         }
     }

@@ -15,11 +15,13 @@ namespace MessageBoard2.Controllers
         public IMyUserService MyUserService { get; set; }
         public IMessageService MessageService { get; set; }
 
+        //修改信息页面
         public ActionResult ChangeUserInfo(string message = "") {
             ViewData["Message"] = message;
             return View("ChangeUserInfo");
         }
 
+        //得到可修改的用户信息
         [HttpPost]
         public ActionResult GetUserInfo() {
             MyUser user = new MyUser() { Username = (string)Session["AccountName"] };
@@ -27,6 +29,7 @@ namespace MessageBoard2.Controllers
             return Json(user);
         }
 
+        //修改用户信息
         [HttpPost]
         public ActionResult ChangeUserInfo(MyUser user) {
             user.Username = (string)Session["AccountName"];
@@ -37,6 +40,7 @@ namespace MessageBoard2.Controllers
             return Json(new { result = false, tip = "由于未知原因，修改信息失败" });
         }
 
+        //修改用户密码
         [HttpPost]
         public ActionResult ChangeUserPassword(string oldPassword, string newPassword) {
             string username = (string)Session["AccountName"];
@@ -52,10 +56,12 @@ namespace MessageBoard2.Controllers
             }
         }
 
+        //留言管理页面
         public ActionResult MessageManage() {
             return View();
         }
 
+        //得到该用户的留言的分页数据
         [HttpPost]
         public ActionResult GetMessageDataGridList(int page = 1, int rows = 10, string KeyWord = "") {
             //为搜索拼接条件字符串
@@ -76,6 +82,7 @@ namespace MessageBoard2.Controllers
             return Json(new { total = total, rows = msgs, page = page });
         }
 
+        //为该用户新增留言
         [HttpPost]
         public ActionResult AddMessage(Message msg) {
             msg.Username = (string)Session["AccountName"];
@@ -87,6 +94,7 @@ namespace MessageBoard2.Controllers
             }
         }
 
+        //得到该用户的某条留言的详细信息，包括回复
         [HttpPost]
         public ActionResult GetMessage(Message msg) {
             msg = MessageService.GetMessage(msg);
@@ -97,6 +105,7 @@ namespace MessageBoard2.Controllers
             return Json(msg);
         }
 
+        //修改未公开留言
         [HttpPost]
         public ActionResult ChangeMessage(Message msg) {
             //以防万一
@@ -112,6 +121,7 @@ namespace MessageBoard2.Controllers
             }
         }
 
+        //删除未公开留言
         [HttpPost]
         public ActionResult DeleteMessage(Message msg) {
             //以防万一

@@ -13,10 +13,12 @@ namespace MessageBoard2.Controllers
     public class MyUserManageController : Controller
     {
         public IMyUserService MyUserService { get; set; }
+        //主页面
         public ActionResult Index() {
             return View();
         }
 
+        //得到用户的分页数据
         public ActionResult GetUserDataGridList(int page = 1, int rows = 10, string KeyWord = "") {
             //为搜索拼接条件字符串
             string sql = "";
@@ -37,6 +39,7 @@ namespace MessageBoard2.Controllers
             return Json(new { total=total, rows=users, page=page});
         }
 
+        //新增用户
         [HttpPost]
         public ActionResult AddUser(MyUser user) {
             bool result = MyUserService.CheckUsername(new MyUser() { Username = user.Username });
@@ -47,6 +50,7 @@ namespace MessageBoard2.Controllers
             return Json(new { result = true, tip = "新增用户成功" });
         }
 
+        //修改用户信息
         [HttpPost]
         public ActionResult EditUser(MyUser user, string OldUsername) {
             //当名字改变时检查是否已存在同名用户
@@ -60,6 +64,7 @@ namespace MessageBoard2.Controllers
             return Json(new { result = true, tip = "修改用户成功" });
         }
 
+        //删除用户
         [HttpPost]
         public ActionResult DeleteUser(MyUser user) {
             int count = MyUserService.DeleteUser(user);

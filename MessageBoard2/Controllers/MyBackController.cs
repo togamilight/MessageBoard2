@@ -10,7 +10,7 @@ namespace MessageBoard2.Controllers
     [AdminFilter]
     public class MyBackController : Controller
     {
-        // GET: MyBack
+        //后台管理的主页
         public ActionResult Index()
         {
             return View();

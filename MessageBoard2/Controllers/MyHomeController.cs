@@ -12,11 +12,13 @@ namespace MessageBoard2.Controllers
     {
         public IMessageService MessageService { get; set; }
         
+        //主页
         public ActionResult Index()
         {
             return View();
         }
 
+        //得到公开留言的分页数据
         [HttpPost]
         public ActionResult GetMessageDataGridList(int page = 1, int rows = 10, string KeyWord = "") {
             //为搜索拼接条件字符串
@@ -37,6 +39,7 @@ namespace MessageBoard2.Controllers
             return Json(new { total = total, rows = msgs, page = page });
         }
 
+        //得到某条公开留言的详细信息，包括回复
         [HttpPost]
         public ActionResult GetMessage(Message msg) {
             msg = MessageService.GetMessage(msg);

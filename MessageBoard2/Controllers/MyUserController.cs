@@ -13,7 +13,7 @@ namespace MessageBoard2.Controllers
     {
         public IMyUserService MyUserService { get; set; }
 
-        //得到头部分部页面
+        //得到头部分部页面，包含已登录用户的信息，新回复数
         public ActionResult GetUserHeader() {
             MyUser user = new MyUser();
             if (Session["AccountStatus"] != null && (MyAccountStatus)Session["AccountStatus"] == MyAccountStatus.User) {
@@ -33,18 +33,21 @@ namespace MessageBoard2.Controllers
             return View("SignUp");
         }
 
+        //确认用户名是否重复
         [HttpPost]
         public ActionResult CheckUsername(string Username) {
             bool result = MyUserService.CheckUsername(new MyUser() { Username = Username});
             return Json(new { isUnique = !result });
         }
 
+        //用户注册
         [HttpPost]
         public ActionResult DoSignUp(MyUser user) {
             MyUserService.AddUser(user);
             return RedirectToAction("Login", new { message = "注册成功，请登录" });
         }
 
+        //登录页面
         public ActionResult Login(string message = "") {
             //已经登录时不能登录
             if (Session["AccountStatus"] != null && (MyAccountStatus)Session["AccountStatus"] == MyAccountStatus.User) {
@@ -54,6 +57,7 @@ namespace MessageBoard2.Controllers
             return View("Login");
         }
 
+        //用户登录
         [HttpPost]
         public ActionResult DoLogin(MyUser user) {
             bool result = MyUserService.CheckUserPassword(user);
@@ -68,6 +72,7 @@ namespace MessageBoard2.Controllers
             }
         }
 
+        //注销
         public ActionResult Logout() {
             //注销，修改Session中的信息
             Session["AccountStatus"] = MyAccountStatus.None;

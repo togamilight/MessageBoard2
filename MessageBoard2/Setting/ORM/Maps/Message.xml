@@ -24,6 +24,7 @@
 
   <!--字段映射-->
   <resultMaps>
+    <!--为了将留言的对应回复也查出来而写的映射-->
     <resultMap id="MessageResult" Class="Message">
       <result property="Id" column="Id"/>
       <result property="Username" column="Username"/>
@@ -33,6 +34,7 @@
       <result property="DateTime" column="DateTime"/>
       <result property="ReplyNum" column="ReplyNum"/>
       <result property="NewReply" column="NewReply"/>
+      <!--从这个statement中得到回复，column是传递过去的参数，Id-->
       <result property="Replies" column="Id" select="Message.GetReplies"/>
     </resultMap>
     <!--<resultMap id="ReplyResult" Class="MessageBoard2.Models.Reply">
