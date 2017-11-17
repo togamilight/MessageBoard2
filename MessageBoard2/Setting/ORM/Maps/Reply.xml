@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="Reply" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!--别名-->
+  <alias>
+    <typeAlias alias="Reply" type="MessageBoard2.Models.Reply,MessageBoard2" />
+  </alias>
+
+  <statements>
+    <!--添加-->
+    <insert id="AddReply" parameterClass="Reply">
+      INSERT INTO Reply(MessageId,AdminName,Content,DateTime)
+      VALUES(#MessageId#,#AdminName#,#Content#,#DateTime#)
+      <!--插入数据之后，model对象的主属性得到自增主键的新值-->
+      <selectKey resultClass="int" type="post" property="Id">
+        SELECT @@IDENTITY AS value
+      </selectKey>
+    </insert>    
+  </statements>
+</sqlMap>

@@ -110,30 +110,30 @@ namespace MessageBoard2.Service {
             return count;
         }
 
-        //得到所有用户
-        public IList<MyUser> GetAllUser() {
-            IList<MyUser> users = new List<MyUser>();
-            try {
-                //条件为空字符串，得到所有
-                users = MyUserDao.GetUsersBySql("", DataMapper.Instance);
-            }
-            catch (Exception) {
-                throw;
-            }
-            return users;
-        }
+        ////得到所有用户
+        //public IList<MyUser> GetAllUser() {
+        //    IList<MyUser> users = new List<MyUser>();
+        //    try {
+        //        //条件为空字符串，得到所有
+        //        users = MyUserDao.GetUsersBySql("", DataMapper.Instance);
+        //    }
+        //    catch (Exception) {
+        //        throw;
+        //    }
+        //    return users;
+        //}
 
-        public IList<MyUser> GetUsersBySql(string whereSql) {
-            IList<MyUser> users = new List<MyUser>();
-            try {
-                //条件为空字符串，得到所有
-                users = MyUserDao.GetUsersBySql(whereSql, DataMapper.Instance);
-            }
-            catch (Exception) {
-                throw;
-            }
-            return users;
-        }
+        //public IList<MyUser> GetUsersBySql(string whereSql) {
+        //    IList<MyUser> users = new List<MyUser>();
+        //    try {
+        //        //
+        //        users = MyUserDao.GetUsersBySql(whereSql, DataMapper.Instance);
+        //    }
+        //    catch (Exception) {
+        //        throw;
+        //    }
+        //    return users;
+        //}
 
         public IList<MyUser> GetUsersPageBySql(SelectPageInfo info) {
             IList<MyUser> users = new List<MyUser>();

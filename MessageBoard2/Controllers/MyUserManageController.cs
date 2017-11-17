@@ -34,7 +34,7 @@ namespace MessageBoard2.Controllers
             };
             IList<MyUser> users = MyUserService.GetUsersPageBySql(info);
 
-            return Json(new { total=total, rows=users, page=page}, JsonRequestBehavior.AllowGet);
+            return Json(new { total=total, rows=users, page=page});
         }
 
         [HttpPost]

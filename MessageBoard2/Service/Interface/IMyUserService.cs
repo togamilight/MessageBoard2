@@ -14,8 +14,8 @@ namespace MessageBoard2.Service.Interface {
         int ChangeUserInfo(MyUser user);
         int ChangeUserInfoByAdmin(MyUser user);
         int ChangeUserPassword(MyUser user);
-        IList<MyUser> GetAllUser();
-        IList<MyUser> GetUsersBySql(string whereSql);
+        //IList<MyUser> GetAllUser();
+        //IList<MyUser> GetUsersBySql(string whereSql);
         IList<MyUser> GetUsersPageBySql(SelectPageInfo info);
         int DeleteUser(MyUser user);
         MyUser GetUserInfo(MyUser user);

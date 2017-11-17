@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<sqlMap namespace="Message" xmlns="http://ibatis.apache.org/mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <!--别名-->
+  <alias>
+    <typeAlias alias="Message" type="MessageBoard2.Models.Message,MessageBoard2" />
+    <!--已在MyUser.xml中定义了别名，不用重复定义，不能与别的命名空间使用相同的别名-->
+    <!--<typeAlias alias="SelectPageInfo1" type="MessageBoard2.Models.SelectPageInfo,MessageBoard2" />-->
+  </alias>
+  <!--缓存模型-->
+  <cacheModels>
+    <cacheModel id="MessageCache" implementation="MEMORY">
+      <flushInterval hours="24"/>
+      <flushOnExecute statement="Message.AddMessage"/>
+      <flushOnExecute statement="Message.DeleteMessage"/>
+      <flushOnExecute statement="Message.ChangeMessage"/>
+      <flushOnExecute statement="Message.SwitchMessageState"/>
+      <flushOnExecute statement="Message.ClearNewReply"/>
+      <flushOnExecute statement="Reply.AddReply"/>
+      <property name="Type" value="WEAK"/>
+    </cacheModel>
+  </cacheModels>
+
+  <!--字段映射-->
+  <resultMaps>
+    <resultMap id="MessageResult" Class="Message">
+      <result property="Id" column="Id"/>
+      <result property="Username" column="Username"/>
+      <result property="Title" column="Title"/>
+      <result property="Content" column="Content"/>
+      <result property="IsPublic" column="IsPublic"/>
+      <result property="DateTime" column="DateTime"/>
+      <result property="ReplyNum" column="ReplyNum"/>
+      <result property="NewReply" column="NewReply"/>
+      <result property="Replies" column="Id" select="Message.GetReplies"/>
+    </resultMap>
+    <!--<resultMap id="ReplyResult" Class="MessageBoard2.Models.Reply">
+      <result property="Id" column="Id"/>
+      <result property="MessageId" column="MessageId"/>
+      <result property="AdminName" column="AdminName"/>
+      <result property="Content" column="Content"/>
+      <result property="DateTime" column="DateTime"/>
+    </resultMap>-->
+  </resultMaps>
+
+  <statements>
+    <!--添加-->
+    <insert id="AddMessage" parameterClass="Message">
+      INSERT INTO Message(Username,Title,Content,DateTime)
+      VALUES(#Username#,#Title#,#Content#,#DateTime#)
+      <!--插入数据之后，model对象的主属性得到自增主键的新值-->
+      <selectKey resultClass="int" type="post" property="Id">
+        SELECT @@IDENTITY AS value
+      </selectKey>
+    </insert>
+
+    <!--根据条件查找留言的数量-->
+    <select id="GetMessageCountBySql" resultClass="int" parameterClass="string" cacheModel="MessageCache">
+      SELECT COUNT(Id) FROM Message WHERE 1=1 $whereSql$
+    </select>
+
+    <!--根据分页信息对留言进行分页查询-->
+    <select id="GetMessagesPageBySql" resultClass="Message" parameterClass="SelectPageInfo"  cacheModel="MessageCache">
+      SELECT TOP $Count$ * FROM Message WHERE Id NOT IN (SELECT TOP $Min$ Id FROM Message WHERE 1=1 $WhereSql$) $WhereSql$ ORDER BY DateTime DESC
+    </select>
+
+    <!--删除,已在数据库写好触发器和级联更新删除，可以自动更新MyUser表和Reply表-->
+    <delete id="DeleteMessage" parameterClass="Message">
+      DELETE FROM Message WHERE Id=#Id#
+    </delete>
+
+    <!--修改留言-->
+    <update id="ChangeMessage" parameterClass="Message">
+      UPDATE Message SET Title = #Title#, Content=#Content# where Id = #Id#
+    </update>
+
+    <!--切换公开状态 -->
+    <update id="SwitchMessageState" parameterClass="Message">
+      UPDATE Message SET
+      IsPublic = (CASE WHEN IsPublic=1 THEN 0 ELSE 1 END) WHERE Id = #Id#
+    </update>
+
+    <!--获取留言，包括对应的回复-->
+    <select id="GetMessage" parameterClass="Message" resultMap="MessageResult">
+      SELECT Message.* FROM Message WHERE Message.Id = #Id# ;
+    </select>
+    <!--取得留言对应的回复-->
+    <select id="GetReplies" parameterClass="int" resultClass="MessageBoard2.Models.Reply">
+      SELECT * FROM Reply WHERE MessageId=#value#
+    </select>
+
+    <!--清除最新留言数 -->
+    <update id="ClearNewReply" parameterClass="Message">
+      BEGIN
+      UPDATE MyUser SET
+      NewReply=NewReply-(SELECT NewReply FROM Message WHERE Id=#Id#)
+      WHERE Username=#Username#;
+      UPDATE Message SET NewReply=0 WHERE Id=#Id#;
+      END
+    </update>
+  </statements>
+</sqlMap>

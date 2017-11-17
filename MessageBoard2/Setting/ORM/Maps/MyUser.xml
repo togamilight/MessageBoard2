@@ -14,6 +14,7 @@
       <flushOnExecute statement="MyUser.DeleteUser"/>
       <flushOnExecute statement="MyUser.ChangeUserPassword"/>
       <flushOnExecute statement="MyUser.ChangeUserInfoByAdmin"/>
+      <flushOnExecute statement="Message.ClearNewReply"/>
       <property name="Type" value="WEAK"/>
     </cacheModel>
   </cacheModels>
@@ -32,13 +33,13 @@
       </selectKey>
     </insert>
     
-    <!--根据条件语句whereSql获取所有对象-->
+    <!--根据条件语句whereSql获取所有对象--><!--
     <select id="GetUsersBySql" resultClass="MyUser" parameterClass="string"  cacheModel="UserCache">
       SELECT * FROM MyUser $whereSql$
-    </select>
+    </select>-->
 
     <!--用来确认该用户名，或者该用户名和密码在数据库中是否存在-->
-    <select id="GetUserCount" resultClass="int" parameterClass="MyUser">
+    <select id="GetUserCount" resultClass="int" parameterClass="MyUser" cacheModel="UserCache">
       SELECT COUNT(Id) FROM MyUser WHERE 1=1
       <dynamic>
         <isNotNull prepend="AND" property="Username">
@@ -51,7 +52,7 @@
     </select>
 
     <!--根据条件查找用户的数量-->
-    <select id="GetUserCountBySql" resultClass="int" parameterClass="string">
+    <select id="GetUserCountBySql" resultClass="int" parameterClass="string" cacheModel="UserCache">
       SELECT COUNT(Id) FROM MyUser WHERE 1=1 $whereSql$
     </select>
 
@@ -62,8 +63,10 @@
 
     <!--为管理员修改用户的基本信息-->
     <update id="ChangeUserInfoByAdmin" parameterClass="MyUser">
-      UPDATE MyUser SET Username = #Username#, Password = #Password#, PhoneNum = #PhoneNum# where Id = #Id#
+      UPDATE MyUser SET 
+      Username = #Username#, Password = #Password#, PhoneNum = #PhoneNum# where Id = #Id#
     </update>
+    
 
     <!--为用户修改密码-->
     <update id="ChangeUserPassword" parameterClass="MyUser">
@@ -76,11 +79,11 @@
     </delete>
 
     <!--为用户获取用户的基本信息，不含密码-->
-    <select id="GetUserInfo" parameterClass="MyUser" resultClass="MyUser">
+    <select id="GetUserInfo" parameterClass="MyUser" resultClass="MyUser" cacheModel="UserCache">
       SELECT Id,Username,PhoneNum,NewReply FROM MyUser WHERE Username=#Username#
     </select>
 
-    <!--根据分页信息都用户进行分页查询-->
+    <!--根据分页信息对用户进行分页查询-->
     <select id="GetUsersPageBySql" resultClass="MyUser" parameterClass="SelectPageInfo"  cacheModel="UserCache">
       SELECT TOP $Count$ * FROM MyUser WHERE Id NOT IN (SELECT TOP $Min$ Id FROM MyUser WHERE 1=1 $WhereSql$) $WhereSql$
     </select>

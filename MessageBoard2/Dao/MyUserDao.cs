@@ -21,16 +21,16 @@ namespace MessageBoard2.Dao {
             return id;
         }
 
-        public IList<MyUser> GetUsersBySql(string whereSql, ISqlMapper sqlMapper) {
-            IList<MyUser> users = new List<MyUser>();
-            try {
-                users = sqlMapper.QueryForList<MyUser>("MyUser.GetUsersBySql", whereSql);
-            }
-            catch (Exception) {
-                throw;
-            }
-            return users;
-        }
+        //public IList<MyUser> GetUsersBySql(string whereSql, ISqlMapper sqlMapper) {
+        //    IList<MyUser> users = new List<MyUser>();
+        //    try {
+        //        users = sqlMapper.QueryForList<MyUser>("MyUser.GetUsersBySql", whereSql);
+        //    }
+        //    catch (Exception) {
+        //        throw;
+        //    }
+        //    return users;
+        //}
 
         public IList<MyUser> GetUsersPageBySql(SelectPageInfo info, ISqlMapper sqlMapper) {
             IList<MyUser> users = new List<MyUser>();
@@ -110,8 +110,6 @@ namespace MessageBoard2.Dao {
 
             return count;
         }
-
-        
 
         public MyUser GetUserInfo(MyUser user, ISqlMapper sqlMapper) {
             try {

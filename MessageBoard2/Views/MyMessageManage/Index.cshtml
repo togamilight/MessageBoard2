@@ -1,0 +1,272 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script type="text/javascript" src="~/jquery_easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="~/jquery_easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="~/MyJavaScript/myJS.js"></script>
+    <link rel="stylesheet" type="text/css" href="~/jquery_easyui/themes/icon.css" />
+    <link rel="stylesheet" type="text/css" href="~/jquery_easyui/themes/default/easyui.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/myCSS.css"/>
+
+    <script type="text/javascript">
+        var getDataURL = "/MyMessageManage/GetMessageDataGridList";
+        $(function () {
+            var isChanged = false;
+            $("#MessageDG").datagrid({
+                url: getDataURL,
+                idField: 'Id',
+                //fit: true,
+                singleSelect: true,
+                toolbar: "#ToolBar",
+                //checkOnSelect: false,
+                //selectOnCheck: false,
+                pagination: true,
+                rownumbers: true,
+                fitColumns: true,
+                method: "POST",
+                contentType: "application/json",
+                customLoad: false,
+                autoRowHeight: false
+            });
+
+            //编辑留言
+            $("#EditBtn").click(function () {
+                isChanged = false;
+                //取得选中行
+                var msg = $('#MessageDG').datagrid('getSelected');
+                if (msg) {
+                    //得到留言id，返回服务器查找留言详情和回复
+                    var id = msg.Id;
+                    GetMessageAndFillEditDiv(id);
+                    //定义对话框按钮
+                    var buttonsObj = [{
+                        text: "关闭",
+                        iconCls: "icon-cancel",
+                        handler: function () {
+                            //如果发生改动，刷新列表
+                            if (isChanged == true)
+                                $("#MessageDG").datagrid("reload");
+                            dia.dialog("close");
+                        }
+                    }];
+                    //开启对话框
+                    var dia = $("#EditMessageDiv").dialog({ "title": "编辑留言", buttons: buttonsObj }).dialog("open");
+                } else {
+                    alert("未选中任何数据");
+                }
+            });
+
+            //根据id取得留言及回复内容并填充编辑留言框
+            function GetMessageAndFillEditDiv(id){
+                var data = {
+                    Id: id
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/MyMessageManage/GetMessage',
+                    data: data,
+                    success: function (r) {
+                        $("#EditId").val(r.Id);
+                        $("#EditTitle").val(r.Title);
+                        $("#EditUsername").text(r.Username);
+                        $("#EditMsgDate").text(DateTimeFormatter(r.DateTime));
+                        $("#EditContent").text(r.Content);
+                        //回复
+                        var replies = r.Replies;
+                        var html = "";
+                        for (var i = 0; i < replies.length; i++) {
+                            html += "<div class='ReplyDiv'><div><span class='AdminName'>" + replies[i].AdminName + "</span><span class='ReplyDate'>" + DateTimeFormatter(replies[i].DateTime) + "</span></div><div class='ReplyContent'>" + replies[i].Content + "</div></div>";
+                        }
+                        $("#RepliesDiv").html(html);
+                    }
+                });
+            }
+
+            //提交修改留言
+            $("#ConfirmBtn").click(function () {
+                var errorInfo = "";     //记录错误信息
+                var title = $("#EditTitle").val();
+                var content = $("#EditContent").val();
+                var id = $("#EditId").val();
+
+                if (/^\s*$/.test(title)) { //判断字符串是否全是空格或为空
+                    errorInfo += "标题不能为空\n";
+                }
+                if (/^\s*$/.test(content)) {   //判断字符串是否全是空格或为空
+                    errorInfo += "内容不能为空\n";
+                }
+                if (errorInfo != "") {
+                    alert(errorInfo);
+                } else {
+                    var data = {
+                        Id: id,
+                        Title: title,
+                        Content: content
+                    };
+                    $.ajax({
+                        type: 'POST',
+                        url: '/MyMessageManage/ChangeMessage',
+                        data: data,
+                        success: function (r) {
+                            isChanged = true;
+                            alert(r.tip);
+                        }
+                    });
+                }
+            });
+
+            //提交回复
+            $("#ReplyBtn").click(function () {
+                var errorInfo = "";     //记录错误信息
+                var id = $("#EditId").val();
+                var content = $("#EditReplyContent").val();
+
+                if (/^\s*$/.test(content)) { //判断字符串是否全是空格或为空
+                    errorInfo += "回复不能为空\n";
+                }
+                if (errorInfo != "") {
+                    alert(errorInfo);
+                } else {
+                    var data = {
+                        MessageId: id,
+                        Content: content
+                    };
+                    $.ajax({
+                        type: 'POST',
+                        url: '/MyMessageManage/AddReply',
+                        data: data,
+                        success: function (r) {
+                            isChanged = true;
+                            GetMessageAndFillEditDiv(id);
+                        }
+                    });
+                }
+            });
+
+            //删除留言
+            $("#DeleteBtn").click(function () {
+                //取得选中行
+                var msg = $('#MessageDG').datagrid('getSelected');
+                if (msg) {
+                    if (confirm("确定删除该留言吗？")) {
+                        //获取Id
+                        var data = {
+                            Id: msg.Id
+                        };
+                        $.ajax({
+                            type: 'POST',
+                            url: '/MyMessageManage/DeleteMessage',
+                            data: data,
+                            success: function (r) {
+                                $("#MessageDG").datagrid("reload");
+                            }
+                        });
+                    }
+                } else {
+                    alert("未选中任何数据");
+                }
+
+            });
+        });
+        //搜索
+        function SearchMessage(value, name) {
+            var errorInfo = "";     //记录错误信息
+            var keyWord = value;
+            var keyWordType = name;
+            if (keyWord.length >= 20) {
+                errorInfo += "关键字不能超过20个字符 \n";
+            } else if (keyWord.indexOf(" ") != -1) {
+                errorInfo += "关键字不能含有空格 \n";
+            }
+            if (errorInfo != "") {
+                alert(errorInfo);
+            } else {
+                var searchObject = {
+                    KeyWord: keyWord,
+                    KeyWordType: keyWordType
+                };
+                $("#MessageDG").datagrid('load', searchObject);
+            }
+        }
+
+        //生成切换状态按钮
+        function CreateSwitchBtn(value, row, index) {
+            return '<a href="javascript:void(0);" onclick="SwitchState(' + index + ');">切换状态</a>';
+        }
+
+        //切换状态
+        function SwitchState(index) {
+            //根据index选中该行并得到该行
+            $('#MessageDG').datagrid('selectRow', index);
+            var row = $('#MessageDG').datagrid('getSelected');
+            var id = row.Id;
+            var data = {
+                Id: id
+            };
+            $.ajax({
+                type: 'POST',
+                url: '/MyMessageManage/SwitchMessageState',
+                data: data,
+                async: false,   //取消异步，改为同步
+                success: function (r) {
+                    $("#MessageDG").datagrid("reload");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    @Html.Partial("AdminHeader")
+    @Html.Partial("MyBackMenuHeader")
+    <table id="MessageDG" title="留言列表">
+        <thead>
+            <tr>
+                <th data-options="field:'Id',width:100">留言Id</th>
+                <th data-options="field:'Username',width:100">用户名</th>
+                <th data-options="field:'Title',width:100">标题</th>
+                <th data-options="field:'Content',width:200">内容</th>
+                <th data-options="field:'DateTime', formatter:DateTimeFormatter,width:100">留言日期</th>
+                <th data-options="field:'IsPublic',width:100">是否公开</th>
+                <th data-options="field:'ReplyNum',width:100">回复数</th>
+                <th data-options="field:'switchBtn',formatter:CreateSwitchBtn">切换状态</th>
+            </tr>
+        </thead>
+    </table>
+
+    <div id="ToolBar">
+        <!--easyui的带菜单的搜索框-->
+        <input id="KeyWord" class="easyui-searchbox" style="width:300px"
+               data-options="searcher:SearchMessage,prompt:'请输入搜索关键字',menu:'#KeyWordTypeMenu'" />
+        <div id="KeyWordTypeMenu" style="width:120px">
+            <div data-options="name:'TitleOrContent'">标题或内容</div>
+            <div data-options="name:'Username'">用户名</div>
+        </div> 
+        <br />
+        <a id="DeleteBtn" href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="true">删除</a>
+        <a id="EditBtn" href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true">编辑</a>
+    </div>
+
+    <div id="EditMessageDiv" data-options="iconCls:'icon-edit',modal:true" style="display:none; width:800px;height:650px; ">
+        <div class="MsgDiv">
+            <input type="text" name="Id" id="EditId" value="" style="display:none" />
+            <input type="text" name="Title" id="EditTitle" value="" />
+            <div class="AuthorInfoDiv"><span class="UserName" id="EditUsername"></span><span class="MsgDate" id="EditMsgDate"></span></div>
+            <textarea rows="12" name="Content" style="margin-top:0" id="EditContent"></textarea>
+            <button class="ConfirmBtn" id="ConfirmBtn"">修改</button>
+            <h4>回复</h4>
+            <div id="RepliesDiv" class="RepliesDiv">
+            </div>
+            <textarea rows="6" name="Content" style="margin-top:15px" placeholder="请输入回复内容" id="EditReplyContent"></textarea>
+            <button class="ReplyBtn" id="ReplyBtn">回复</button>
+        </div>
+    </div>
+</body>
+</html>
