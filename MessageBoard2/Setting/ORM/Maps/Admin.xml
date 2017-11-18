@@ -29,7 +29,7 @@
     </insert>
 
     <!--用来确认该管理员名，或者该管理员名和密码在数据库中是否存在-->
-    <select id="GetAdminCount" resultClass="int" parameterClass="Admin">
+    <select id="GetAdminCount" resultClass="int" parameterClass="Admin" cacheModel="AdminCache">
       SELECT COUNT(Id) FROM Admin WHERE 1=1
       <dynamic>
         <isNotNull prepend="AND" property="AdminName">

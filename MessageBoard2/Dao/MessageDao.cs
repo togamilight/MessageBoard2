@@ -26,7 +26,6 @@ namespace MessageBoard2.Dao {
             catch (Exception) {
                 throw;
             }
-
             return msg;
         }
 

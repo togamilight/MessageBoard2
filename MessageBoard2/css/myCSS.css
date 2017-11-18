@@ -1,32 +1,4 @@
-﻿.MsgTitleDiv{
-			display: flex;
-			align-items: center;
-			width: 1000px;
-			margin: 0 auto;
-			padding-top: 10px;
-            padding-bottom: 10px;
-			border-top: 1px solid black;
-		}
-.MsgTitleDiv .MsgId{
-			display: none;
-		}
-		.MsgTitleDiv .MsgDate{
-			font-size: 12px;
-			color: grey;
-		}
-		.MsgTitleDiv .Title{
-			display: inline-block;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			width: 50%;
-            padding-left:10px;
-		}
-		.MsgTitleDiv span{
-			margin-left: 30px;
-		}
-
-.MsgDiv {
+﻿.MsgDiv {
     margin: 0 auto;
     width: 500px;
     display: flex;
@@ -39,8 +11,8 @@
         width: 100%;
     }
 
-    .MsgDiv input, .MsgDiv textarea{
-        margin-top: 10px
+    .MsgDiv input, .MsgDiv textarea {
+        margin-top: 10px;
     }
 
     .MsgDiv textarea {
@@ -53,41 +25,42 @@
         margin-left: 10px;
     }
 
-    .MsgDiv .ConfirmBtn, .MsgDiv .ReplyBtn{
-			margin-top: 10px;
-		}
-		
-    .MsgDiv .RepliesDiv{
+    .MsgDiv .ConfirmBtn, .MsgDiv .ReplyBtn {
+        margin-top: 10px;
+    }
+
+    .MsgDiv .RepliesDiv {
         width: 100%;
     }
-		.MsgDiv .ReplyDiv{
-			
-			padding: 10px;
-			border-bottom: 1px solid black;
-		}
-		.MsgDiv .ReplyDiv .AdminName{
-			font-size: 14px;
-		}
-		.MsgDiv .ReplyDiv .ReplyDate{
-			font-size: 10px;
-			color: grey;
-			margin-left: 10px;
-		}
-		.MsgDiv .ReplyDiv .ReplyContent{
-			margin-top: 10px;
-			font-size: 16px;
-            word-wrap:break-word;
-		}
-		
-		.MsgDiv .TitleDiv, .MsgDiv .ContentDiv{
-			margin-top: 10px;
-			word-wrap:break-word;
-			font-size: 22px;
-			margin-bottom: 10px;
-			/*border-left: 1px solid gray;
-			border-right: 1px solid gray;*/
-            border-bottom: 1px solid gray;
-			padding-left: 10px;
-			padding-right: 10px;
-            padding-bottom: 10px;
-		}
+
+    .MsgDiv .ReplyDiv {
+        padding: 10px;
+        border-bottom: 1px solid black;
+    }
+
+        .MsgDiv .ReplyDiv .AdminName {
+            font-size: 14px;
+        }
+
+        .MsgDiv .ReplyDiv .ReplyDate {
+            font-size: 10px;
+            color: grey;
+            margin-left: 10px;
+        }
+
+        .MsgDiv .ReplyDiv .ReplyContent {
+            margin-top: 10px;
+            font-size: 16px;
+            word-wrap: break-word;
+        }
+
+    .MsgDiv .TitleDiv, .MsgDiv .ContentDiv {
+        margin-top: 10px;
+        word-wrap: break-word;
+        font-size: 22px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid gray;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: 10px;
+    }

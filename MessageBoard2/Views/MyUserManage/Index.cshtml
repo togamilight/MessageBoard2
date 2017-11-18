@@ -79,7 +79,7 @@
                     $("#EditUsername").val(user.Username);
                     $("#EditPassword").val(user.Password);
                     $("#EditPhoneNum").val(user.PhoneNum);
-                    $("#EditSignDate").val(DateTimeFormatter(user.SignDate));
+                    $("#EditSignDate").val(DateFormatter(user.SignDate));
                     //定义对话框按钮
                     var buttonsObj = [{
                         text: "修改",
@@ -98,7 +98,7 @@
                 
             });
 
-            //编辑用户
+            //删除用户
             $("#DeleteBtn").click(function () {
                 //取得选中行
                 var user = $('#UserDG').datagrid('getSelected');

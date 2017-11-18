@@ -10,14 +10,12 @@ namespace MessageBoard2.Dao {
     public class AdminDao : IAdminDao {
         public int AddAdmin(Admin admin, ISqlMapper sqlMapper) {
             int id = 0;
-
             try {
                 id = Convert.ToInt32(sqlMapper.Insert("Admin.AddAdmin", admin));
             }
             catch (Exception) {
                 throw;
             }
-
             return id;
         }
 

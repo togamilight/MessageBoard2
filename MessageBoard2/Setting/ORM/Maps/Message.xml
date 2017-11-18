@@ -92,7 +92,7 @@
       SELECT * FROM Reply WHERE MessageId=#value#
     </select>
 
-    <!--清除最新留言数 -->
+    <!--清除留言的最新回复数，更新该用户的最新回复数 -->
     <update id="ClearNewReply" parameterClass="Message">
       BEGIN
       UPDATE MyUser SET

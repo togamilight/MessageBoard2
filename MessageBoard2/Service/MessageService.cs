@@ -94,7 +94,7 @@ namespace MessageBoard2.Service {
             int count = 0;
             ISqlMapper sqlMapper = DataMapper.Instance;
             try {
-                //开启事务
+                //因为这个操作包含两条语句，开启事务
                 sqlMapper.BeginTransaction();
                 count = MessageDao.ClearNewReply(msg, sqlMapper);
                 //提交事务
