@@ -44,13 +44,14 @@
     <select id="GetUserCount" resultClass="int" parameterClass="MyUser" cacheModel="UserCache">
       SELECT COUNT(Id) FROM MyUser WHERE 1=1
       <dynamic>
-        <isNotNull prepend="AND" property="Username">
+        <isNotEmpty prepend="AND" property="Username">
           Username=#Username#
-        </isNotNull>
-        <isNotNull prepend="AND" property="Password">
+        </isNotEmpty>
+        <isNotEmpty prepend="AND" property="Password">
           Password=#Password#
-        </isNotNull>
-      </dynamic>
+        </isNotEmpty>
+      
+    </dynamic>
     </select>
 
     <!--根据条件查找用户的数量-->

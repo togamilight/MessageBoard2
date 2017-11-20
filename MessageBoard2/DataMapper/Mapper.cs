@@ -29,6 +29,7 @@ namespace MessageBoard2.DataMapper {
         public void InitMapper(string sqlMapperPath) {
             ConfigureHandler handler = new ConfigureHandler(Configure);
             DomSqlMapBuilder builder = new DomSqlMapBuilder();
+            //设置文件缓存依赖，每当sqlMapperPath指向的配置文件被修改，就调用handler，即Configure方法将实例置为null，再重新获取
             _mapper = builder.ConfigureAndWatch(sqlMapperPath, handler);
             _mapper.SessionStore = new IBatisNet.DataMapper.SessionStore.HybridWebThreadSessionStore(_mapper.Id);
         }

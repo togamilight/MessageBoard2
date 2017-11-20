@@ -1,4 +1,5 @@
-﻿using MessageBoard2.Filters;
+﻿
+using MessageBoard2.Filters;
 using MessageBoard2.Models;
 using MessageBoard2.Service.Interface;
 using System;
@@ -41,7 +42,6 @@ namespace MessageBoard2.Controllers
                 }
                 
             }
-
             //得到数据总条数
             int total = MessageService.GetMessageCountBySql(sql);
             //分页查询
